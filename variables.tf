@@ -41,3 +41,19 @@ variable "vm_password" {
     sensitive = true
 }
 
+variable "unique_name" {
+    type = string
+    description = "Unique Name"
+}
+
+variable "hostname" {
+    type = string
+    description = "Host Name"
+    default = "demowasp"  
+}
+
+variable "hostname_direct" {
+    type = string
+    description = "owaspdirect"
+    default = "owaspdirect"  
+}
