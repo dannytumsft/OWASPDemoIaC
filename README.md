@@ -6,10 +6,6 @@ This Terraform deployment includes everything needed to test Azure WAF Security 
 
 This [blogpost](https://techcommunity.microsoft.com/t5/azure-network-security-blog/part-1-lab-setup-azure-waf-security-protection-and-detection-lab/ba-p/2030469) provides additional guidance into how this lab works and testing out WAF attack scenarios.  
 
-## PowerShell Deployment Example:
-
-Please use this location as a reference on how this powershell commandlet works: https://docs.microsoft.com/en-us/azure/azure-resource-manager/templates/deploy-powershell#deploy-remote-template
-
 There are ***TBD*** parameters with defaults
 * DefaultUserName
 * DefaultPassword
