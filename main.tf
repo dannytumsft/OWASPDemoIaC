@@ -44,10 +44,10 @@ resource "azurerm_cdn_frontdoor_endpoint" "res-5" {
   ]
 }
 resource "azurerm_cdn_frontdoor_route" "res-6" {
-  cdn_frontdoor_custom_domain_ids  = [azurerm_cdn_frontdoor_custom_domain.res-7.id]
+  cdn_frontdoor_custom_domain_ids = [azurerm_cdn_frontdoor_custom_domain.res-7.id]
   cdn_frontdoor_endpoint_id       = azurerm_cdn_frontdoor_endpoint.res-5.id
   cdn_frontdoor_origin_group_id   = azurerm_cdn_frontdoor_origin_group.res-8.id
-  cdn_frontdoor_origin_ids = [azurerm_cdn_frontdoor_origin.res-9.id]
+  cdn_frontdoor_origin_ids        = [azurerm_cdn_frontdoor_origin.res-9.id]
   forwarding_protocol             = "HttpOnly"
   https_redirect_enabled          = false
   name                            = "AppGW"
@@ -119,6 +119,11 @@ resource "azurerm_cdn_frontdoor_security_policy" "res-10" {
     azurerm_cdn_frontdoor_profile.res-4,
   ]
 }
+resource "azurerm_marketplace_agreement" "kali" {
+  publisher = "kali-linux"
+  offer     = "kali-linux"
+  plan      = "kali"
+}
 resource "azurerm_linux_virtual_machine" "res-11" {
   admin_password                  = var.vm_password
   admin_username                  = var.vm_admin
@@ -145,6 +150,7 @@ resource "azurerm_linux_virtual_machine" "res-11" {
   }
   depends_on = [
     azurerm_network_interface.res-29,
+    azurerm_marketplace_agreement.kali,
   ]
 }
 resource "azurerm_windows_virtual_machine" "res-14" {
@@ -257,6 +263,7 @@ resource "azurerm_application_gateway" "res-18" {
   frontend_ip_configuration {
     name                          = "appGwPrivateFrontendIp"
     private_ip_address_allocation = "Static"
+    private_ip_address            = "10.0.25.120"
     subnet_id                     = azurerm_subnet.res-42.id
   }
   frontend_port {
