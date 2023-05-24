@@ -1,7 +1,7 @@
 resource "azurerm_windows_virtual_machine" "res-0" {
   admin_password        = "0w@sp-D3mo!@#"
   admin_username        = "eagle"
-  location              = "eastus"
+  location              = var.location
   name                  = "VM-Win11"
   network_interface_ids = [azurerm_network_interface.res-28.id]
   resource_group_name   = "RGNETSECLABWAF"
@@ -24,7 +24,7 @@ resource "azurerm_windows_virtual_machine" "res-0" {
   ]
 }
 resource "azurerm_resource_group" "res-3" {
-  location = "eastus"
+  location = var.location
   name     = "rgNetSecLabWAF"
 }
 resource "azurerm_cdn_frontdoor_profile" "res-4" {
@@ -123,7 +123,7 @@ resource "azurerm_linux_virtual_machine" "res-11" {
   admin_password                  = "0w@sp-D3mo!@#"
   admin_username                  = "eagle"
   disable_password_authentication = false
-  location                        = "eastus"
+  location                        = var.location
   name                            = "VM-Kali"
   network_interface_ids           = [azurerm_network_interface.res-29.id]
   resource_group_name             = "rgNetSecLabWAF"
@@ -151,7 +151,7 @@ resource "azurerm_windows_virtual_machine" "res-14" {
   admin_password        = "0w@sp-D3mo!@#"
   admin_username        = "eagle"
   license_type          = "Windows_Server"
-  location              = "eastus"
+  location              = var.location
   name                  = "VM-Win2019"
   network_interface_ids = [azurerm_network_interface.res-30.id]
   resource_group_name   = "rgNetSecLabWAF"
@@ -174,7 +174,7 @@ resource "azurerm_windows_virtual_machine" "res-14" {
   ]
 }
 resource "azurerm_web_application_firewall_policy" "res-17" {
-  location            = "eastus"
+  location            = var.location
   name                = "SOC-NS-AGPolicy"
   resource_group_name = "rgNetSecLabWAF"
   custom_rules {
@@ -234,7 +234,7 @@ resource "azurerm_web_application_firewall_policy" "res-17" {
 }
 resource "azurerm_application_gateway" "res-18" {
   firewall_policy_id  = azurerm_web_application_firewall_policy.res-17.id
-  location            = "eastus"
+  location            = var.location
   name                = "SOC-NS-AG-WAFv2"
   resource_group_name = "rgNetSecLabWAF"
   backend_address_pool {
@@ -302,7 +302,7 @@ resource "azurerm_application_gateway" "res-18" {
 }
 resource "azurerm_firewall" "res-19" {
   firewall_policy_id  = azurerm_firewall_policy.res-21.id
-  location            = "eastus"
+  location            = var.location
   name                = "SOC-NS-FW"
   resource_group_name = "rgNetSecLabWAF"
   sku_name            = "AZFW_VNet"
@@ -319,7 +319,7 @@ resource "azurerm_firewall" "res-19" {
   ]
 }
 resource "azurerm_network_ddos_protection_plan" "res-20" {
-  location            = "eastus"
+  location            = var.location
   name                = "SOCNSDDOSPLAN"
   resource_group_name = "rgNetSecLabWAF"
   depends_on = [
@@ -327,7 +327,7 @@ resource "azurerm_network_ddos_protection_plan" "res-20" {
   ]
 }
 resource "azurerm_firewall_policy" "res-21" {
-  location                 = "eastus"
+  location                 = var.location
   name                     = "SOC-NS-FWPolicy"
   resource_group_name      = "rgNetSecLabWAF"
   threat_intelligence_mode = "Deny"
@@ -507,7 +507,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "res-27" {
   ]
 }
 resource "azurerm_network_interface" "res-28" {
-  location            = "eastus"
+  location            = var.location
   name                = "Nic1"
   resource_group_name = "rgNetSecLabWAF"
   ip_configuration {
@@ -521,7 +521,7 @@ resource "azurerm_network_interface" "res-28" {
   ]
 }
 resource "azurerm_network_interface" "res-29" {
-  location            = "eastus"
+  location            = var.location
   name                = "Nic2"
   resource_group_name = "rgNetSecLabWAF"
   ip_configuration {
@@ -535,7 +535,7 @@ resource "azurerm_network_interface" "res-29" {
   ]
 }
 resource "azurerm_network_interface" "res-30" {
-  location            = "eastus"
+  location            = var.location
   name                = "Nic3"
   resource_group_name = "rgNetSecLabWAF"
   ip_configuration {
@@ -549,7 +549,7 @@ resource "azurerm_network_interface" "res-30" {
   ]
 }
 resource "azurerm_network_security_group" "res-31" {
-  location            = "eastus"
+  location            = var.location
   name                = "SOC-NS-NSG-SPOKE1"
   resource_group_name = "rgNetSecLabWAF"
   depends_on = [
@@ -589,7 +589,7 @@ resource "azurerm_network_security_rule" "res-33" {
   ]
 }
 resource "azurerm_network_security_group" "res-34" {
-  location            = "eastus"
+  location            = var.location
   name                = "SOC-NS-NSG-SPOKE2"
   resource_group_name = "rgNetSecLabWAF"
   depends_on = [
@@ -630,7 +630,7 @@ resource "azurerm_network_security_rule" "res-36" {
 }
 resource "azurerm_public_ip" "res-37" {
   allocation_method   = "Static"
-  location            = "eastus"
+  location            = var.location
   name                = "SOCNSAGPIP"
   resource_group_name = "rgNetSecLabWAF"
   sku                 = "Standard"
@@ -641,7 +641,7 @@ resource "azurerm_public_ip" "res-37" {
 }
 resource "azurerm_public_ip" "res-38" {
   allocation_method   = "Static"
-  location            = "eastus"
+  location            = var.location
   name                = "SOCNSFWPIP"
   resource_group_name = "rgNetSecLabWAF"
   sku                 = "Standard"
@@ -651,7 +651,7 @@ resource "azurerm_public_ip" "res-38" {
   ]
 }
 resource "azurerm_route_table" "res-39" {
-  location            = "eastus"
+  location            = var.location
   name                = "SOC-NS-DEFAULT-ROUTE"
   resource_group_name = "rgNetSecLabWAF"
   depends_on = [
@@ -671,7 +671,7 @@ resource "azurerm_route" "res-40" {
 }
 resource "azurerm_virtual_network" "res-41" {
   address_space       = ["10.0.25.0/24"]
-  location            = "eastus"
+  location            = var.location
   name                = "VN-HUB"
   resource_group_name = "rgNetSecLabWAF"
   tags = {
@@ -729,7 +729,7 @@ resource "azurerm_virtual_network_peering" "res-45" {
 }
 resource "azurerm_virtual_network" "res-46" {
   address_space       = ["10.0.27.0/24"]
-  location            = "eastus"
+  location            = var.location
   name                = "VN-SPOKE1"
   resource_group_name = "rgNetSecLabWAF"
   tags = {
@@ -804,7 +804,7 @@ resource "azurerm_virtual_network_peering" "res-53" {
 }
 resource "azurerm_virtual_network" "res-54" {
   address_space       = ["10.0.28.0/24"]
-  location            = "eastus"
+  location            = var.location
   name                = "VN-SPOKE2"
   resource_group_name = "rgNetSecLabWAF"
   tags = {
@@ -878,7 +878,7 @@ resource "azurerm_virtual_network_peering" "res-61" {
   ]
 }
 resource "azurerm_log_analytics_workspace" "res-62" {
-  location            = "eastus"
+  location            = var.location
   name                = "netseclabwaf"
   resource_group_name = "rgNetSecLabWAF"
   depends_on = [
@@ -886,7 +886,7 @@ resource "azurerm_log_analytics_workspace" "res-62" {
   ]
 }
 resource "azurerm_service_plan" "res-540" {
-  location            = "eastus"
+  location            = var.location
   name                = "OWASP-ASP"
   os_type             = "Linux"
   resource_group_name = "rgNetSecLabWAF"
@@ -901,7 +901,7 @@ resource "azurerm_linux_web_app" "res-541" {
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
     linux_fx_version = "DOCKER|mohitkusecurity/juice-shop-updated"
   }
-  location            = "eastus"
+  location            = var.location
   name                = "owaspdirect-danny"
   resource_group_name = "rgNetSecLabWAF"
   service_plan_id     = azurerm_service_plan.res-540.id
