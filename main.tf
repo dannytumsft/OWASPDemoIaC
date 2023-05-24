@@ -1,10 +1,10 @@
 resource "azurerm_windows_virtual_machine" "res-0" {
-  admin_password        = "0w@sp-D3mo!@#"
-  admin_username        = "eagle"
+  admin_password        = var.vm_password
+  admin_username        = var.vm_admin
   location              = var.location
   name                  = "VM-Win11"
   network_interface_ids = [azurerm_network_interface.res-28.id]
-  resource_group_name   = "RGNETSECLABWAF"
+  resource_group_name   = var.resourceGroupName
   size                  = "Standard_D2s_v3"
   identity {
     type = "SystemAssigned"
@@ -25,11 +25,11 @@ resource "azurerm_windows_virtual_machine" "res-0" {
 }
 resource "azurerm_resource_group" "res-3" {
   location = var.location
-  name     = "rgNetSecLabWAF"
+  name     = var.resourceGroupName
 }
 resource "azurerm_cdn_frontdoor_profile" "res-4" {
-  name                     = "Demowasp-danny-migrated"
-  resource_group_name      = "rgNetSecLabWAF"
+  name                     = "${var.hostname}-${var.unique_name}-migrated"
+  resource_group_name      = var.resourceGroupName
   response_timeout_seconds = 30
   sku_name                 = "Premium_AzureFrontDoor"
   depends_on = [
@@ -38,7 +38,7 @@ resource "azurerm_cdn_frontdoor_profile" "res-4" {
 }
 resource "azurerm_cdn_frontdoor_endpoint" "res-5" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.res-4.id
-  name                     = "Demowasp-danny"
+  name                     = "${var.hostname}-${var.unique_name}"
   depends_on = [
     azurerm_cdn_frontdoor_profile.res-4,
   ]
@@ -61,8 +61,8 @@ resource "azurerm_cdn_frontdoor_route" "res-6" {
 }
 resource "azurerm_cdn_frontdoor_custom_domain" "res-7" {
   cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.res-4.id
-  host_name                = "Demowasp-danny.azurefd.net"
-  name                     = "Demowasp-danny-azurefd-net"
+  host_name                = "${var.hostname}-${var.unique_name}.azurefd.net"
+  name                     = "${var.hostname}-${var.unique_name}-azurefd-net"
   tls {
   }
   depends_on = [
@@ -120,13 +120,13 @@ resource "azurerm_cdn_frontdoor_security_policy" "res-10" {
   ]
 }
 resource "azurerm_linux_virtual_machine" "res-11" {
-  admin_password                  = "0w@sp-D3mo!@#"
-  admin_username                  = "eagle"
+  admin_password                  = var.vm_password
+  admin_username                  = var.vm_admin
   disable_password_authentication = false
   location                        = var.location
   name                            = "VM-Kali"
   network_interface_ids           = [azurerm_network_interface.res-29.id]
-  resource_group_name             = "rgNetSecLabWAF"
+  resource_group_name             = var.resourceGroupName
   size                            = "Standard_D2s_v3"
   os_disk {
     caching              = "ReadWrite"
@@ -148,13 +148,13 @@ resource "azurerm_linux_virtual_machine" "res-11" {
   ]
 }
 resource "azurerm_windows_virtual_machine" "res-14" {
-  admin_password        = "0w@sp-D3mo!@#"
-  admin_username        = "eagle"
+  admin_password        = var.vm_password
+  admin_username        = var.vm_admin
   license_type          = "Windows_Server"
   location              = var.location
   name                  = "VM-Win2019"
   network_interface_ids = [azurerm_network_interface.res-30.id]
-  resource_group_name   = "rgNetSecLabWAF"
+  resource_group_name   = var.resourceGroupName
   size                  = "Standard_D2s_v3"
   identity {
     type = "SystemAssigned"
@@ -176,7 +176,7 @@ resource "azurerm_windows_virtual_machine" "res-14" {
 resource "azurerm_web_application_firewall_policy" "res-17" {
   location            = var.location
   name                = "SOC-NS-AGPolicy"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   custom_rules {
     action    = "Block"
     name      = "SentinelBlockIP"
@@ -236,15 +236,15 @@ resource "azurerm_application_gateway" "res-18" {
   firewall_policy_id  = azurerm_web_application_firewall_policy.res-17.id
   location            = var.location
   name                = "SOC-NS-AG-WAFv2"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   backend_address_pool {
-    fqdns = ["owaspdirect-danny.azurewebsites.net"]
+    fqdns = ["owaspdirect-${var.unique_name}.azurewebsites.net"]
     name  = "PAAS-APP"
   }
   backend_http_settings {
     affinity_cookie_name  = "ApplicationGatewayAffinity"
     cookie_based_affinity = "Disabled"
-    host_name             = "owaspdirect-danny.azurewebsites.net"
+    host_name             = "owaspdirect-${var.unique_name}.azurewebsites.net"
     name                  = "Default"
     port                  = 443
     protocol              = "Https"
@@ -304,7 +304,7 @@ resource "azurerm_firewall" "res-19" {
   firewall_policy_id  = azurerm_firewall_policy.res-21.id
   location            = var.location
   name                = "SOC-NS-FW"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   sku_name            = "AZFW_VNet"
   sku_tier            = "Standard"
   ip_configuration {
@@ -321,7 +321,7 @@ resource "azurerm_firewall" "res-19" {
 resource "azurerm_network_ddos_protection_plan" "res-20" {
   location            = var.location
   name                = "SOCNSDDOSPLAN"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   depends_on = [
     azurerm_resource_group.res-3,
   ]
@@ -329,7 +329,7 @@ resource "azurerm_network_ddos_protection_plan" "res-20" {
 resource "azurerm_firewall_policy" "res-21" {
   location                 = var.location
   name                     = "SOC-NS-FWPolicy"
-  resource_group_name      = "rgNetSecLabWAF"
+  resource_group_name      = var.resourceGroupName
   threat_intelligence_mode = "Deny"
   depends_on = [
     azurerm_resource_group.res-3,
@@ -509,11 +509,12 @@ resource "azurerm_firewall_policy_rule_collection_group" "res-27" {
 resource "azurerm_network_interface" "res-28" {
   location            = var.location
   name                = "Nic1"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   ip_configuration {
     name                          = "ipconfig1"
     private_ip_address_allocation = "Static"
     private_ip_address_version    = "IPv4"
+    private_ip_address            = "10.0.27.4"
     subnet_id                     = azurerm_subnet.res-47.id
   }
   depends_on = [
@@ -523,11 +524,12 @@ resource "azurerm_network_interface" "res-28" {
 resource "azurerm_network_interface" "res-29" {
   location            = var.location
   name                = "Nic2"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   ip_configuration {
     name                          = "ipconfig1"
     private_ip_address_allocation = "Static"
     private_ip_address_version    = "IPv4"
+    private_ip_address            = "10.0.27.68"
     subnet_id                     = azurerm_subnet.res-50.id
   }
   depends_on = [
@@ -537,11 +539,12 @@ resource "azurerm_network_interface" "res-29" {
 resource "azurerm_network_interface" "res-30" {
   location            = var.location
   name                = "Nic3"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   ip_configuration {
     name                          = "ipconfig1"
     private_ip_address_allocation = "Static"
     private_ip_address_version    = "IPv4"
+    private_ip_address            = "10.0.28.4"
     subnet_id                     = azurerm_subnet.res-55.id
   }
   depends_on = [
@@ -551,7 +554,7 @@ resource "azurerm_network_interface" "res-30" {
 resource "azurerm_network_security_group" "res-31" {
   location            = var.location
   name                = "SOC-NS-NSG-SPOKE1"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   depends_on = [
     azurerm_resource_group.res-3,
   ]
@@ -565,7 +568,7 @@ resource "azurerm_network_security_rule" "res-32" {
   network_security_group_name = azurerm_network_security_group.res-31.name
   priority                    = 100
   protocol                    = "*"
-  resource_group_name         = "rgNetSecLabWAF"
+  resource_group_name         = var.resourceGroupName
   source_address_prefix       = "10.0.28.0/24"
   source_port_range           = "*"
   depends_on = [
@@ -581,7 +584,7 @@ resource "azurerm_network_security_rule" "res-33" {
   network_security_group_name = azurerm_network_security_group.res-31.name
   priority                    = 100
   protocol                    = "*"
-  resource_group_name         = "rgNetSecLabWAF"
+  resource_group_name         = var.resourceGroupName
   source_address_prefix       = "VirtualNetwork"
   source_port_range           = "*"
   depends_on = [
@@ -591,7 +594,7 @@ resource "azurerm_network_security_rule" "res-33" {
 resource "azurerm_network_security_group" "res-34" {
   location            = var.location
   name                = "SOC-NS-NSG-SPOKE2"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   depends_on = [
     azurerm_resource_group.res-3,
   ]
@@ -605,7 +608,7 @@ resource "azurerm_network_security_rule" "res-35" {
   network_security_group_name = azurerm_network_security_group.res-34.name
   priority                    = 100
   protocol                    = "*"
-  resource_group_name         = "rgNetSecLabWAF"
+  resource_group_name         = var.resourceGroupName
   source_address_prefix       = "10.0.27.0/24"
   source_port_range           = "*"
   depends_on = [
@@ -621,7 +624,7 @@ resource "azurerm_network_security_rule" "res-36" {
   network_security_group_name = azurerm_network_security_group.res-34.name
   priority                    = 100
   protocol                    = "*"
-  resource_group_name         = "rgNetSecLabWAF"
+  resource_group_name         = var.resourceGroupName
   source_address_prefix       = "VirtualNetwork"
   source_port_range           = "*"
   depends_on = [
@@ -632,7 +635,7 @@ resource "azurerm_public_ip" "res-37" {
   allocation_method   = "Static"
   location            = var.location
   name                = "SOCNSAGPIP"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   sku                 = "Standard"
   zones               = ["1", "2", "3"]
   depends_on = [
@@ -643,7 +646,7 @@ resource "azurerm_public_ip" "res-38" {
   allocation_method   = "Static"
   location            = var.location
   name                = "SOCNSFWPIP"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   sku                 = "Standard"
   zones               = ["1", "2", "3"]
   depends_on = [
@@ -653,7 +656,7 @@ resource "azurerm_public_ip" "res-38" {
 resource "azurerm_route_table" "res-39" {
   location            = var.location
   name                = "SOC-NS-DEFAULT-ROUTE"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   depends_on = [
     azurerm_resource_group.res-3,
   ]
@@ -663,7 +666,7 @@ resource "azurerm_route" "res-40" {
   name                   = "DefaultRoute"
   next_hop_in_ip_address = "10.0.25.4"
   next_hop_type          = "VirtualAppliance"
-  resource_group_name    = "rgNetSecLabWAF"
+  resource_group_name    = var.resourceGroupName
   route_table_name       = azurerm_route_table.res-39.name
   depends_on = [
     azurerm_route_table.res-39,
@@ -673,7 +676,7 @@ resource "azurerm_virtual_network" "res-41" {
   address_space       = ["10.0.25.0/24"]
   location            = var.location
   name                = "VN-HUB"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   tags = {
     displayName = "VN-HUB"
   }
@@ -688,7 +691,7 @@ resource "azurerm_virtual_network" "res-41" {
 resource "azurerm_subnet" "res-42" {
   address_prefixes     = ["10.0.25.64/26"]
   name                 = "AGWAFSubnet"
-  resource_group_name  = "rgNetSecLabWAF"
+  resource_group_name  = var.resourceGroupName
   service_endpoints    = ["Microsoft.AzureActiveDirectory", "Microsoft.KeyVault", "Microsoft.ServiceBus", "Microsoft.Sql", "Microsoft.Storage", "Microsoft.Web"]
   virtual_network_name = "VN-HUB"
   depends_on = [
@@ -698,7 +701,7 @@ resource "azurerm_subnet" "res-42" {
 resource "azurerm_subnet" "res-43" {
   address_prefixes     = ["10.0.25.0/26"]
   name                 = "AzureFirewallSubnet"
-  resource_group_name  = "rgNetSecLabWAF"
+  resource_group_name  = var.resourceGroupName
   service_endpoints    = ["Microsoft.AzureActiveDirectory", "Microsoft.KeyVault", "Microsoft.ServiceBus", "Microsoft.Sql", "Microsoft.Storage", "Microsoft.Web"]
   virtual_network_name = "VN-HUB"
   depends_on = [
@@ -709,7 +712,7 @@ resource "azurerm_virtual_network_peering" "res-44" {
   allow_forwarded_traffic   = true
   name                      = "VN-HUB-Peering-To-VN-SPOKE1"
   remote_virtual_network_id = azurerm_virtual_network.res-46.id
-  resource_group_name       = "rgNetSecLabWAF"
+  resource_group_name       = var.resourceGroupName
   virtual_network_name      = "VN-HUB"
   depends_on = [
     azurerm_virtual_network.res-41,
@@ -720,7 +723,7 @@ resource "azurerm_virtual_network_peering" "res-45" {
   allow_forwarded_traffic   = true
   name                      = "VN-HUB-Peering-To-VN-SPOKE2"
   remote_virtual_network_id = azurerm_virtual_network.res-54.id
-  resource_group_name       = "rgNetSecLabWAF"
+  resource_group_name       = var.resourceGroupName
   virtual_network_name      = "VN-HUB"
   depends_on = [
     azurerm_virtual_network.res-41,
@@ -731,7 +734,7 @@ resource "azurerm_virtual_network" "res-46" {
   address_space       = ["10.0.27.0/24"]
   location            = var.location
   name                = "VN-SPOKE1"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   tags = {
     displayName = "VN-SPOKE1"
   }
@@ -742,7 +745,7 @@ resource "azurerm_virtual_network" "res-46" {
 resource "azurerm_subnet" "res-47" {
   address_prefixes     = ["10.0.27.0/26"]
   name                 = "SPOKE1-SUBNET1"
-  resource_group_name  = "rgNetSecLabWAF"
+  resource_group_name  = var.resourceGroupName
   service_endpoints    = ["Microsoft.AzureActiveDirectory", "Microsoft.KeyVault", "Microsoft.ServiceBus", "Microsoft.Sql", "Microsoft.Storage", "Microsoft.Web"]
   virtual_network_name = "VN-SPOKE1"
   depends_on = [
@@ -768,7 +771,7 @@ resource "azurerm_subnet_route_table_association" "res-49" {
 resource "azurerm_subnet" "res-50" {
   address_prefixes     = ["10.0.27.64/26"]
   name                 = "SPOKE1-SUBNET2"
-  resource_group_name  = "rgNetSecLabWAF"
+  resource_group_name  = var.resourceGroupName
   service_endpoints    = ["Microsoft.AzureActiveDirectory", "Microsoft.KeyVault", "Microsoft.ServiceBus", "Microsoft.Sql", "Microsoft.Storage", "Microsoft.Web"]
   virtual_network_name = "VN-SPOKE1"
   depends_on = [
@@ -795,7 +798,7 @@ resource "azurerm_virtual_network_peering" "res-53" {
   allow_forwarded_traffic   = true
   name                      = "VN-SPOKE1-Peering-To-VN-HUB"
   remote_virtual_network_id = azurerm_virtual_network.res-41.id
-  resource_group_name       = "rgNetSecLabWAF"
+  resource_group_name       = var.resourceGroupName
   virtual_network_name      = "VN-SPOKE1"
   depends_on = [
     azurerm_virtual_network.res-41,
@@ -806,7 +809,7 @@ resource "azurerm_virtual_network" "res-54" {
   address_space       = ["10.0.28.0/24"]
   location            = var.location
   name                = "VN-SPOKE2"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   tags = {
     displayName = "VN-SPOKE2"
   }
@@ -817,7 +820,7 @@ resource "azurerm_virtual_network" "res-54" {
 resource "azurerm_subnet" "res-55" {
   address_prefixes     = ["10.0.28.0/26"]
   name                 = "SPOKE2-SUBNET1"
-  resource_group_name  = "rgNetSecLabWAF"
+  resource_group_name  = var.resourceGroupName
   service_endpoints    = ["Microsoft.AzureActiveDirectory", "Microsoft.KeyVault", "Microsoft.ServiceBus", "Microsoft.Sql", "Microsoft.Storage", "Microsoft.Web"]
   virtual_network_name = "VN-SPOKE2"
   depends_on = [
@@ -843,7 +846,7 @@ resource "azurerm_subnet_route_table_association" "res-57" {
 resource "azurerm_subnet" "res-58" {
   address_prefixes     = ["10.0.28.64/26"]
   name                 = "SPOKE2-SUBNET2"
-  resource_group_name  = "rgNetSecLabWAF"
+  resource_group_name  = var.resourceGroupName
   service_endpoints    = ["Microsoft.AzureActiveDirectory", "Microsoft.KeyVault", "Microsoft.ServiceBus", "Microsoft.Sql", "Microsoft.Storage", "Microsoft.Web"]
   virtual_network_name = "VN-SPOKE2"
   depends_on = [
@@ -870,7 +873,7 @@ resource "azurerm_virtual_network_peering" "res-61" {
   allow_forwarded_traffic   = true
   name                      = "VN-SPOKE2-Peering-To-VN-HUB"
   remote_virtual_network_id = azurerm_virtual_network.res-41.id
-  resource_group_name       = "rgNetSecLabWAF"
+  resource_group_name       = var.resourceGroupName
   virtual_network_name      = "VN-SPOKE2"
   depends_on = [
     azurerm_virtual_network.res-41,
@@ -880,7 +883,7 @@ resource "azurerm_virtual_network_peering" "res-61" {
 resource "azurerm_log_analytics_workspace" "res-62" {
   location            = var.location
   name                = "netseclabwaf"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   depends_on = [
     azurerm_resource_group.res-3,
   ]
@@ -889,7 +892,7 @@ resource "azurerm_service_plan" "res-540" {
   location            = var.location
   name                = "OWASP-ASP"
   os_type             = "Linux"
-  resource_group_name = "rgNetSecLabWAF"
+  resource_group_name = var.resourceGroupName
   sku_name            = "S1"
   depends_on = [
     azurerm_resource_group.res-3,
@@ -902,8 +905,8 @@ resource "azurerm_linux_web_app" "res-541" {
     linux_fx_version = "DOCKER|mohitkusecurity/juice-shop-updated"
   }
   location            = var.location
-  name                = "owaspdirect-danny"
-  resource_group_name = "rgNetSecLabWAF"
+  name                = "owaspdirect-${var.unique_name}"
+  resource_group_name = var.resourceGroupName
   service_plan_id     = azurerm_service_plan.res-540.id
   site_config {
     ftps_state = "FtpsOnly"
@@ -913,9 +916,9 @@ resource "azurerm_linux_web_app" "res-541" {
   ]
 }
 resource "azurerm_app_service_custom_hostname_binding" "res-545" {
-  app_service_name    = "owaspdirect-danny"
-  hostname            = "owaspdirect-danny.azurewebsites.net"
-  resource_group_name = "rgNetSecLabWAF"
+  app_service_name    = "owaspdirect-${var.unique_name}"
+  hostname            = "owaspdirect-${var.unique_name}.azurewebsites.net"
+  resource_group_name = var.resourceGroupName
   depends_on = [
     azurerm_linux_web_app.res-541,
   ]
@@ -926,7 +929,7 @@ resource "azurerm_cdn_frontdoor_firewall_policy" "res-571" {
   mode                              = "Prevention"
   name                              = "socnsfdpolicyPremium"
   redirect_url                      = "https://www.microsoft.com/en-us/edge"
-  resource_group_name               = "rgNetSecLabWAF"
+  resource_group_name               = var.resourceGroupName
   sku_name                          = "Premium_AzureFrontDoor"
   custom_rule {
     action               = "Block"
