@@ -57,7 +57,6 @@ resource "azurerm_cdn_frontdoor_route" "res-6" {
     azurerm_cdn_frontdoor_endpoint.res-5,
     azurerm_cdn_frontdoor_custom_domain.res-7,
     azurerm_cdn_frontdoor_origin_group.res-8,
-    azurerm_cdn_frontdoor_origin.res-9,
   ]
 }
 resource "azurerm_cdn_frontdoor_custom_domain" "res-7" {
@@ -239,13 +238,13 @@ resource "azurerm_application_gateway" "res-18" {
   name                = "SOC-NS-AG-WAFv2"
   resource_group_name = "rgNetSecLabWAF"
   backend_address_pool {
-    fqdns = ["owaspdirect-euapucwdmwdc2.azurewebsites.net"]
+    fqdns = ["owaspdirect-danny.azurewebsites.net"]
     name  = "PAAS-APP"
   }
   backend_http_settings {
     affinity_cookie_name  = "ApplicationGatewayAffinity"
     cookie_based_affinity = "Disabled"
-    host_name             = "owaspdirect-euapucwdmwdc2.azurewebsites.net"
+    host_name             = "owaspdirect-danny.azurewebsites.net"
     name                  = "Default"
     port                  = 443
     protocol              = "Https"
@@ -514,6 +513,7 @@ resource "azurerm_network_interface" "res-28" {
   ip_configuration {
     name                          = "ipconfig1"
     private_ip_address_allocation = "Static"
+    private_ip_address_version    = "IPv4"
     subnet_id                     = azurerm_subnet.res-47.id
   }
   depends_on = [
@@ -527,6 +527,7 @@ resource "azurerm_network_interface" "res-29" {
   ip_configuration {
     name                          = "ipconfig1"
     private_ip_address_allocation = "Static"
+    private_ip_address_version    = "IPv4"
     subnet_id                     = azurerm_subnet.res-50.id
   }
   depends_on = [
@@ -540,6 +541,7 @@ resource "azurerm_network_interface" "res-30" {
   ip_configuration {
     name                          = "ipconfig1"
     private_ip_address_allocation = "Static"
+    private_ip_address_version    = "IPv4"
     subnet_id                     = azurerm_subnet.res-55.id
   }
   depends_on = [
@@ -900,7 +902,7 @@ resource "azurerm_linux_web_app" "res-541" {
     linux_fx_version = "DOCKER|mohitkusecurity/juice-shop-updated"
   }
   location            = "eastus"
-  name                = "owaspdirect-euapucwdmwdc2"
+  name                = "owaspdirect-danny"
   resource_group_name = "rgNetSecLabWAF"
   service_plan_id     = azurerm_service_plan.res-540.id
   site_config {
@@ -911,8 +913,8 @@ resource "azurerm_linux_web_app" "res-541" {
   ]
 }
 resource "azurerm_app_service_custom_hostname_binding" "res-545" {
-  app_service_name    = "owaspdirect-euapucwdmwdc2"
-  hostname            = "owaspdirect-euapucwdmwdc2.azurewebsites.net"
+  app_service_name    = "owaspdirect-danny"
+  hostname            = "owaspdirect-danny.azurewebsites.net"
   resource_group_name = "rgNetSecLabWAF"
   depends_on = [
     azurerm_linux_web_app.res-541,
