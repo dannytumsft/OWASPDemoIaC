@@ -1,0 +1,8 @@
+resourceGroupName = "rgAzNetSecLab"
+location = "eastus"
+AzFrontDoor = ""
+WebAppName = ""
+Log_analytics_name = ""
+App_Gateway = ""
+vm_admin = ""
+vm_password = "0w@sp-D3mo!@#"
