@@ -403,7 +403,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "res-26" {
     name     = "APPGW-WEBAPP"
     priority = 100
     rule {
-      destination_address = "20.241.230.206"
+      destination_address = azurerm_public_ip.res-38.ip_address
       destination_ports   = ["443"]
       name                = "DNATRule"
       protocols           = ["TCP"]
@@ -417,7 +417,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "res-26" {
     name     = "VM-Win11"
     priority = 101
     rule {
-      destination_address = "20.241.230.206"
+      destination_address = azurerm_public_ip.res-38.ip_address
       destination_ports   = ["33891"]
       name                = "DNATRule"
       protocols           = ["TCP"]
@@ -431,7 +431,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "res-26" {
     name     = "Kali-SSH"
     priority = 102
     rule {
-      destination_address = "20.241.230.206"
+      destination_address = azurerm_public_ip.res-38.ip_address
       destination_ports   = ["22"]
       name                = "SSH-DNATRule"
       protocols           = ["TCP"]
@@ -445,7 +445,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "res-26" {
     name     = "Kali-RDP"
     priority = 103
     rule {
-      destination_address = "20.241.230.206"
+      destination_address = azurerm_public_ip.res-38.ip_address
       destination_ports   = ["33892"]
       name                = "DNATRule"
       protocols           = ["TCP"]
@@ -459,7 +459,7 @@ resource "azurerm_firewall_policy_rule_collection_group" "res-26" {
     name     = "VM-Win2019"
     priority = 104
     rule {
-      destination_address = "20.241.230.206"
+      destination_address = azurerm_public_ip.res-38.ip_address
       destination_ports   = ["33890"]
       name                = "DNATRule"
       protocols           = ["TCP"]
