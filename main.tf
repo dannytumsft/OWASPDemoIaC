@@ -28,7 +28,7 @@ resource "azurerm_resource_group" "res-3" {
   name     = var.resourceGroupName
 }
 resource "azurerm_cdn_frontdoor_profile" "res-4" {
-  name                     = "${var.hostname}-${var.unique_name}-migrated"
+  name                     = "${var.hostname}-${var.unique_name}"
   resource_group_name      = var.resourceGroupName
   response_timeout_seconds = 30
   sku_name                 = "Premium_AzureFrontDoor"
@@ -90,9 +90,9 @@ resource "azurerm_cdn_frontdoor_origin_group" "res-8" {
 resource "azurerm_cdn_frontdoor_origin" "res-9" {
   cdn_frontdoor_origin_group_id  = azurerm_cdn_frontdoor_origin_group.res-8.id
   certificate_name_check_enabled = true
-  host_name                      = "20.241.231.6"
+  host_name                      = azurerm_public_ip.res-37.ip_address
   name                           = "5bf80d53-4a64-4f03-a84f-f937b20a75f5"
-  origin_host_header             = "20.241.231.6"
+  origin_host_header             = azurerm_public_ip.res-37.ip_address
   weight                         = 50
   depends_on = [
     azurerm_cdn_frontdoor_origin_group.res-8,
@@ -121,7 +121,7 @@ resource "azurerm_cdn_frontdoor_security_policy" "res-10" {
 }
 resource "azurerm_marketplace_agreement" "kali" {
   publisher = "kali-linux"
-  offer     = "kali-linux"
+  offer     = "kali"
   plan      = "kali"
 }
 resource "azurerm_linux_virtual_machine" "res-11" {
@@ -334,6 +334,7 @@ resource "azurerm_network_ddos_protection_plan" "res-20" {
   ]
 }
 resource "azurerm_firewall_policy" "res-21" {
+  sku                      = "Standard"
   location                 = var.location
   name                     = "SOC-NS-FWPolicy"
   resource_group_name      = var.resourceGroupName
@@ -909,7 +910,6 @@ resource "azurerm_linux_web_app" "res-541" {
   app_settings = {
     DOCKER_REGISTRY_SERVER_URL          = "https://index.docker.io"
     WEBSITES_ENABLE_APP_SERVICE_STORAGE = "false"
-    linux_fx_version = "DOCKER|mohitkusecurity/juice-shop-updated"
   }
   location            = var.location
   name                = "owaspdirect-${var.unique_name}"
@@ -917,17 +917,13 @@ resource "azurerm_linux_web_app" "res-541" {
   service_plan_id     = azurerm_service_plan.res-540.id
   site_config {
     ftps_state = "FtpsOnly"
+    application_stack {
+      docker_image = "mohitkusecurity/juice-shop-updated"
+      docker_image_tag = "latest"
+    }
   }
   depends_on = [
     azurerm_service_plan.res-540,
-  ]
-}
-resource "azurerm_app_service_custom_hostname_binding" "res-545" {
-  app_service_name    = "owaspdirect-${var.unique_name}"
-  hostname            = "owaspdirect-${var.unique_name}.azurewebsites.net"
-  resource_group_name = var.resourceGroupName
-  depends_on = [
-    azurerm_linux_web_app.res-541,
   ]
 }
 resource "azurerm_cdn_frontdoor_firewall_policy" "res-571" {
