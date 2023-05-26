@@ -8,4 +8,4 @@ vm_admin = "vm_admin"
 vm_password = "0w@sp-D3mo!@#"
 unique_name = "dannymsft" #Enter your own unique name
 hostname = "demowasp"
-hostname_direct = "owaspdirect"
+
