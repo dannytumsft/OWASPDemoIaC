@@ -92,6 +92,7 @@ resource "azurerm_cdn_frontdoor_origin" "res-9" {
   certificate_name_check_enabled = true
   host_name                      = azurerm_public_ip.res-37.ip_address
   name                           = "5bf80d53-4a64-4f03-a84f-f937b20a75f5"
+  enabled                        = true
   origin_host_header             = azurerm_public_ip.res-37.ip_address
   weight                         = 50
   depends_on = [
