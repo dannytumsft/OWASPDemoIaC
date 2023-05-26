@@ -44,7 +44,7 @@ resource "azurerm_cdn_frontdoor_endpoint" "res-5" {
   ]
 }
 resource "azurerm_cdn_frontdoor_route" "res-6" {
-  cdn_frontdoor_custom_domain_ids = [azurerm_cdn_frontdoor_custom_domain.res-7.id]
+#  cdn_frontdoor_custom_domain_ids = [azurerm_cdn_frontdoor_custom_domain.res-7.id]
   cdn_frontdoor_endpoint_id       = azurerm_cdn_frontdoor_endpoint.res-5.id
   cdn_frontdoor_origin_group_id   = azurerm_cdn_frontdoor_origin_group.res-8.id
   cdn_frontdoor_origin_ids        = [azurerm_cdn_frontdoor_origin.res-9.id]
@@ -55,18 +55,7 @@ resource "azurerm_cdn_frontdoor_route" "res-6" {
   supported_protocols             = ["Http", "Https"]
   depends_on = [
     azurerm_cdn_frontdoor_endpoint.res-5,
-    azurerm_cdn_frontdoor_custom_domain.res-7,
     azurerm_cdn_frontdoor_origin_group.res-8,
-  ]
-}
-resource "azurerm_cdn_frontdoor_custom_domain" "res-7" {
-  cdn_frontdoor_profile_id = azurerm_cdn_frontdoor_profile.res-4.id
-  host_name                = "${var.hostname}-${var.unique_name}.azurefd.net"
-  name                     = "${var.hostname}-${var.unique_name}-azurefd-net"
-  tls {
-  }
-  depends_on = [
-    azurerm_cdn_frontdoor_profile.res-4,
   ]
 }
 resource "azurerm_cdn_frontdoor_origin_group" "res-8" {
@@ -108,9 +97,6 @@ resource "azurerm_cdn_frontdoor_security_policy" "res-10" {
       association {
         patterns_to_match = ["/*"]
         domain {
-          cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_custom_domain.res-7.id
-        }
-        domain {
           cdn_frontdoor_domain_id = azurerm_cdn_frontdoor_endpoint.res-5.id
         }
       }
@@ -120,11 +106,11 @@ resource "azurerm_cdn_frontdoor_security_policy" "res-10" {
     azurerm_cdn_frontdoor_profile.res-4,
   ]
 }
-resource "azurerm_marketplace_agreement" "kali" {
-  publisher = "kali-linux"
-  offer     = "kali"
-  plan      = "kali"
-}
+# resource "azurerm_marketplace_agreement" "kali" {
+#   publisher = "kali-linux"
+#   offer     = "kali"
+#   plan      = "kali"
+# }
 resource "azurerm_linux_virtual_machine" "res-11" {
   admin_password                  = var.vm_password
   admin_username                  = var.vm_admin
@@ -151,7 +137,7 @@ resource "azurerm_linux_virtual_machine" "res-11" {
   }
   depends_on = [
     azurerm_network_interface.res-29,
-    azurerm_marketplace_agreement.kali,
+    # azurerm_marketplace_agreement.kali,
   ]
 }
 resource "azurerm_windows_virtual_machine" "res-14" {
@@ -696,7 +682,7 @@ resource "azurerm_virtual_network" "res-41" {
   depends_on = [
     azurerm_network_ddos_protection_plan.res-20,
   ]
-}
+ }
 resource "azurerm_subnet" "res-42" {
   address_prefixes     = ["10.0.25.64/26"]
   name                 = "AGWAFSubnet"
