@@ -6,15 +6,10 @@ This Terraform deployment includes everything needed to test Azure WAF Security 
 
 This [blogpost](https://techcommunity.microsoft.com/t5/azure-network-security-blog/part-1-lab-setup-azure-waf-security-protection-and-detection-lab/ba-p/2030469) provides additional guidance into how this lab works and testing out WAF attack scenarios.  
 
-There are ***TBD*** parameters with defaults
-* DefaultUserName
-* DefaultPassword
-* DDOSProtectionConfiguration (bool) - true by default
-
-Adding some `samples` to give context
-- Subscription ID : "12345678-1234-1234-1234-b826eef6c592"
-- Log Analyitcs Workspace name: "TestWorkspace"
-- Resource Group Log Analytics workspace is in: "TestResourceGroup"
+Update your variables.tf and terraform.tfvars
+* vm_admin
+* vm_password
+* unique_name
 
 **Example Terraform command with some parameters configured:**
 >terraform apply -
