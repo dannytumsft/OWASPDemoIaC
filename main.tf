@@ -106,18 +106,14 @@ resource "azurerm_cdn_frontdoor_security_policy" "res-10" {
     azurerm_cdn_frontdoor_profile.res-4,
   ]
 }
-# resource "azurerm_marketplace_agreement" "kali" {
-#   publisher = "kali-linux"
-#   offer     = "kali"
-#   plan      = "kali"
-# }
- resource "null_resource" "kali" {
-   provisioner "local-exec" {
-     command = <<EOT
-     az vm image accept-terms --offer 'kali' --plan 'kali' --publisher 'kali-linux'
-     EOT
-   }
- }
+resource "null_resource" "kali" {
+
+  provisioner "local-exec" {
+    command = <<EOT
+    az vm image accept-terms --urn kali-linux:kali:kali:latest
+    EOT
+  }
+}
 resource "azurerm_linux_virtual_machine" "res-11" {
   admin_password                  = var.vm_password
   admin_username                  = var.vm_admin
