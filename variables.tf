@@ -51,9 +51,3 @@ variable "hostname" {
     description = "Host Name"
     default = "demowasp"  
 }
-
-variable "hostname_direct" {
-    type = string
-    description = "owaspdirect"
-    default = "owaspdirect"  
-}
