@@ -11,11 +11,12 @@ Update your variables.tf and terraform.tfvars
 * vm_password
 * unique_name
 
-**Example Terraform command with some parameters configured:**
->terraform apply -
+**Example Terraform command:**
+>terraform plan
+>terraform apply
 
 
-## What is included with the AzNetSec Deployment Template
+## What is included with the AzNetSec Terraform Deployment Template
 
 | Resource |  Purpose |
 |----------|---------|
